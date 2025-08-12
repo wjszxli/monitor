@@ -1,0 +1,29 @@
+{
+  "server_chan_send_key": "YOUR_SERVERCHAN_SENDKEY",
+  "monitor_count": 5,
+  "check_interval": 3600,
+  "sites": [
+    {
+      "name": "Example University News",
+      "url": "https://www.example.edu/news",
+      "enabled": true,
+      "base_url": "https://www.example.edu",
+      "selectors": {
+        "list_container": "div.news-list ul",
+        "list_item": "li",
+        "link": "a"
+      }
+    },
+    {
+      "name": "Another Website Announcements",
+      "url": "https://www.another-site.com/announcements",
+      "enabled": true,
+      "base_url": "https://www.another-site.com",
+      "selectors": {
+        "list_container": ".post-container",
+        "list_item": ".post-item",
+        "link": "a.post-title-link"
+      }
+    }
+  ]
+}

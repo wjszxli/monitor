@@ -1,0 +1,17 @@
+# Local configuration
+config.json
+
+# Log files
+*.log
+*.err
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
