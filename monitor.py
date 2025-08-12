@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 import os
 import json
@@ -15,7 +17,22 @@ CONFIG_FILE = os.path.join(SCRIPT_DIR, "config.json")
 ANNOUNCEMENTS_FILE = os.path.join(SCRIPT_DIR, "announcements.json")
 # 全局配置
 CONFIG = {}
+# 创建一个带有重试逻辑的全局 Session
+SESSION = requests.Session()
 
+def setup_session():
+    """
+    配置全局 Session，增加重试机制。
+    """
+    retries = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "POST", "OPTIONS"]
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    SESSION.mount("http://", adapter)
+    SESSION.mount("https://", adapter)
 
 def load_config():
     """
@@ -48,7 +65,7 @@ def send_notification(title, body):
     api_url = f"https://sctapi.ftqq.com/{send_key}.send"
     payload = {"title": title, "desp": body}
     try:
-        response = requests.post(api_url, data=payload)
+        response = SESSION.post(api_url, data=payload, timeout=15)
         response.raise_for_status()
         result = response.json()
         if result.get("code") == 0:
@@ -70,7 +87,7 @@ def get_latest_announcements(site_config):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36)"
         }
-        response = requests.get(site_config["url"], headers=headers, timeout=30)
+        response = SESSION.get(site_config["url"], headers=headers, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "lxml")
 
@@ -190,6 +207,8 @@ def main():
     主函数，执行所有已启用站点的监控。
     """
     print(f"--- Starting check cycle at {time.strftime('%Y-%m-%d %H:%M:%S')} ---")
+    
+    setup_session()
 
     load_config()
 
@@ -211,3 +230,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

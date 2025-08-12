@@ -14,6 +14,9 @@ echo "Cron job started at: $(date)"
 cd "${SCRIPT_DIR}"
 echo "Current directory: $(pwd)"
 
+echo "Installing dependencies from requirements.txt..."
+pip3 install -r requirements.txt
+
 echo "Executing python script..."
 # 使用 'python3' 命令, 假设它在用户的 PATH 中
 # 或者, 如果 monitor.py 有可执行权限并且 shebang 正确, 可以直接运行 ./monitor.py
